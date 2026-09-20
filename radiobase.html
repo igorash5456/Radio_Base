@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>РадиоБаза / RadioBase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #07090f;
+  --bg2:      #0b0f1a;
+  --bg3:      #0f1525;
+  --panel:    #111827;
+  --border:   #1a2740;
+  --border2:  #243552;
+  --accent:   #00e5ff;
+  --accent2:  #7c3aed;
+  --accent3:  #10b981;
+  --text:     #e2e8f0;
+  --muted:    #64748b;
+  --muted2:   #94a3b8;
+  --danger:   #ef4444;
+  --warn:     #f59e0b;
+  --mono:     'Share Tech Mono', monospace;
+  --sans:     'Exo 2', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+/* Grid background */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ─── Header ─── */
+#header{
+  position:relative;
+  z-index:10;
+  background:linear-gradient(180deg,rgba(11,15,26,.98) 0%,rgba(11,15,26,.92) 100%);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:10px 20px;
+  flex-shrink:0;
+  box-shadow:0 2px 30px rgba(0,229,255,.06);
+}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-icon{
+  width:40px;height:40px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  box-shadow:0 0 18px rgba(0,229,255,.35);
+  flex-shrink:0;
+}
+.logo-text{
+  font-size:22px;font-weight:900;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.5px;
+  font-family:var(--sans);
+}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;font-family:var(--mono)}
+
+.search-wrap{
+  flex:1;max-width:520px;display:flex;gap:8px;
+}
+.search-input{
+  flex:1;
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  padding:8px 14px;
+  color:var(--text);
+  font-size:13px;
+  font-family:var(--mono);
+  outline:none;
+  transition:border-color .2s;
+}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--muted)}
+.btn{
+  border:none;border-radius:8px;padding:8px 14px;
+  color:#fff;cursor:pointer;
+  font-family:var(--sans);font-weight:700;font-size:12px;
+  letter-spacing:.03em;transition:opacity .15s,transform .1s;white-space:nowrap;
+}
+.btn:hover{opacity:.88;transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-search{background:linear-gradient(135deg,#0369a1,var(--accent2))}
+.btn-add{background:linear-gradient(135deg,#065f46,var(--accent3))}
+.btn-lang{
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:7px;
+  padding:7px 13px;
+  color:var(--muted2);
+  cursor:pointer;
+  font-family:var(--mono);
+  font-size:11px;
+  transition:border-color .2s, color .2s;
+}
+.btn-lang:hover{border-color:var(--accent);color:var(--accent)}
+.header-right{display:flex;gap:8px;align-items:center}
+
+/* ─── Statbar ─── */
+#statbar{
+  position:relative;z-index:9;
+  background:rgba(7,9,15,.95);
+  border-bottom:1px solid var(--border);
+  display:flex;flex-shrink:0;
+}
+.stat-cell{
+  flex:1;padding:7px 12px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.stat-cell:last-of-type{border-right:none}
+.stat-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent);line-height:1}
+.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-top:2px}
+.ai-badge{
+  display:flex;align-items:center;gap:7px;padding:0 16px;
+  font-size:11px;color:var(--muted);font-family:var(--mono);
+}
+.ai-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--accent3);
+  box-shadow:0 0 8px var(--accent3);
+  animation:pulse 1.4s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ─── Layout ─── */
+#layout{display:flex;flex:1;overflow:hidden;position:relative;z-index:1}
+
+/* ─── Sidebar ─── */
+#sidebar{
+  width:190px;flex-shrink:0;
+  background:rgba(11,15,26,.97);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.side-label{
+  font-size:9px;color:var(--muted);
+  letter-spacing:.18em;text-transform:uppercase;
+  padding:14px 14px 6px;
+  font-family:var(--mono);
+}
+.cat-item{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 14px;cursor:pointer;
+  border-left:3px solid transparent;
+  transition:all .15s;color:var(--muted);font-size:13px;
+  font-weight:600;
+}
+.cat-item:hover{color:var(--text);background:rgba(0,229,255,.04)}
+.cat-item.active{color:var(--text);background:rgba(0,229,255,.07)}
+.cat-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.cat-count{
+  margin-left:auto;font-size:11px;font-family:var(--mono);
+  background:var(--bg3);border-radius:4px;padding:1px 6px;
+}
+
+/* ─── Main ─── */
+#main{
+  flex:1;overflow-y:auto;
+  padding:16px;display:flex;flex-direction:column;gap:14px;
+}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sort-btn{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;padding:5px 11px;
+  color:var(--muted);cursor:pointer;font-size:11px;
+  font-family:var(--mono);transition:all .15s;
+}
+.sort-btn:hover{color:var(--text);border-color:var(--border2)}
+.sort-btn.active{background:#0d2040;border-color:#0369a1;color:#7dd3fc}
+.result-count{margin-left:auto;font-size:11px;color:var(--muted);font-family:var(--mono)}
+
+/* ─── Grid ─── */
+.comp-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:12px;
+}
+.comp-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;padding:15px;
+  cursor:pointer;
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.comp-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.card-stripe{
+  position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:12px 12px 0 0;
+}
+.card-name{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:3px;font-family:var(--sans)}
+.card-mfr{font-size:11px;color:var(--muted);margin-bottom:8px;font-family:var(--mono)}
+.card-desc{
+  font-size:12px;color:var(--muted2);line-height:1.5;margin-bottom:10px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card-foot{display:flex;justify-content:space-between;align-items:center}
+.badge{border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:.05em;font-family:var(--mono)}
+.qty-ok{font-size:12px;font-family:var(--mono);font-weight:700;color:var(--accent3)}
+.qty-zero{font-size:12px;font-family:var(--mono);font-weight:700;color:var(--danger)}
+
+/* ─── Empty ─── */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:52px;margin-bottom:14px;opacity:.4}
+.empty-title{font-size:15px;margin-bottom:6px;color:var(--muted2)}
+.empty-hint{font-size:12px;font-family:var(--mono)}
+
+/* ─── Online panel ─── */
+.online-panel{
+  background:var(--bg2);
+  border:1px solid #1a3a5f;
+  border-radius:12px;padding:16px;
+}
+.online-title{
+  font-size:11px;color:var(--accent);text-transform:uppercase;
+  letter-spacing:.14em;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;font-family:var(--mono);
+}
+.online-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:13px;margin-bottom:9px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+}
+.online-name{font-weight:700;font-size:14px;color:#f1f5f9;margin-bottom:2px}
+.online-meta{font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)}
+.online-desc{font-size:12px;color:var(--muted2);line-height:1.5}
+.spec-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.spec-chip{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:4px;padding:2px 8px;
+  font-size:11px;color:#7dd3fc;font-family:var(--mono);
+}
+.btn-online-add{
+  background:linear-gradient(135deg,#0369a1,var(--accent2));
+  border:none;border-radius:7px;padding:8px 14px;
+  color:#fff;cursor:pointer;font-size:11px;font-weight:700;
+  font-family:var(--sans);white-space:nowrap;flex-shrink:0;
+  transition:opacity .15s;
+}
+.btn-online-add:hover{opacity:.85}
+.btn-online-add.done{background:#065f46;cursor:default}
+.spinner{display:inline-block;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── Modal overlay ─── */
+#overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.78);z-index:500;
+  align-items:center;justify-content:center;padding:16px;
+  backdrop-filter:blur(5px);
+}
+#overlay.open{display:flex}
+.modal{
+  background:var(--bg2);
+  border:1px solid #1a3a5f;
+  border-radius:16px;
+  width:100%;max-width:680px;max-height:90vh;
+  overflow-y:auto;
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
+  animation:slide-in .2s ease;
+}
+@keyframes slide-in{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.modal-head{
+  padding:18px 22px;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:flex-start;
+  position:relative;
+}
+.modal-stripe{position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+.modal-title{font-size:22px;font-weight:900;color:#f1f5f9;margin-top:4px}
+.modal-sub{font-size:12px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.modal-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.modal-actions{display:flex;gap:7px;flex-shrink:0}
+.btn-close{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:5px 11px;color:var(--muted2);cursor:pointer;font-size:12px;font-family:var(--sans)}
+.btn-close:hover{color:var(--text)}
+.btn-del{background:#450a0a;border:1px solid #7f1d1d;border-radius:6px;padding:5px 11px;color:#fca5a5;cursor:pointer;font-size:12px;font-family:var(--sans)}
+.btn-del:hover{background:#7f1d1d}
+
+/* Tabs */
+.tabs{display:flex;padding:0 22px;border-bottom:1px solid var(--border)}
+.tab-btn{
+  padding:11px 15px;font-size:11px;background:none;border:none;
+  border-bottom:2px solid transparent;color:var(--muted);
+  cursor:pointer;font-family:var(--mono);text-transform:uppercase;
+  letter-spacing:.08em;transition:all .15s;
+}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{border-bottom-color:var(--accent);color:var(--accent)}
+
+.modal-body{padding:20px 22px}
+.desc-box{
+  font-size:13px;color:var(--muted2);line-height:1.7;
+  padding:12px 14px;background:var(--bg3);border-radius:8px;
+  margin-bottom:16px;border-left:3px solid;
+}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spec-item{background:var(--bg3);border-radius:8px;padding:10px 14px}
+.spec-key{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;font-family:var(--mono)}
+.spec-val{font-size:15px;font-weight:700;color:#7dd3fc;font-family:var(--mono)}
+
+/* Documents */
+.doc-link{
+  display:flex;align-items:center;gap:11px;padding:13px 15px;
+  background:var(--bg3);border:1px solid;border-radius:10px;
+  color:var(--text);text-decoration:none;margin-bottom:9px;
+  transition:background .15s;
+}
+.doc-link:hover{background:var(--panel)}
+.doc-link-icon{font-size:22px}
+.doc-link-title{font-weight:700;font-size:13px;margin-bottom:2px}
+.doc-link-url{font-size:11px;color:var(--muted);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Pinout */
+.pinout-box{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;padding:16px;
+  font-size:13px;color:var(--muted2);
+  line-height:1.7;font-family:var(--mono);
+}
+
+/* Inventory */
+.inv-row{
+  display:flex;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.inv-label{color:var(--muted)}
+.inv-val{font-weight:700;font-family:var(--mono)}
+
+/* Add form modal */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)}
+.form-input,.form-select,.form-textarea{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:7px;padding:8px 12px;color:var(--text);
+  font-size:13px;font-family:var(--mono);outline:none;
+  transition:border-color .2s;width:100%;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-select option{background:var(--bg2)}
+.form-textarea{resize:vertical;min-height:70px}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+.btn-save{
+  background:linear-gradient(135deg,#0369a1,var(--accent2));
+  border:none;border-radius:8px;padding:9px 20px;
+  color:#fff;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--sans);
+}
+.btn-cancel{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:8px;padding:9px 16px;
+  color:var(--muted2);cursor:pointer;font-size:13px;font-family:var(--sans);
+}
+
+/* ─── Responsive ─── */
+@media(max-width:700px){
+  #sidebar{display:none}
+  .form-grid{grid-template-columns:1fr}
+  .spec-grid{grid-template-columns:1fr}
+  #header{flex-wrap:wrap}
+  .search-wrap{order:3;max-width:100%;flex:0 0 100%}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text" id="lbl-title">РадиоБаза</div>
+      <div class="logo-sub" id="lbl-sub">База данных электронных компонентов</div>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <input class="search-input" id="search-input" placeholder="Поиск компонентов..." autocomplete="off"/>
+    <button class="btn btn-search" id="btn-online" onclick="onlineSearch()">Найти в сети</button>
+  </div>
+
+  <div class="header-right">
+    <button class="btn-lang" onclick="toggleLang()" id="btn-lang">English</button>
+    <button class="btn btn-add" onclick="openAddModal()">+ <span id="lbl-add">Добавить</span></button>
+  </div>
+</header>
+
+<!-- STATBAR -->
+<div id="statbar">
+  <div class="stat-cell">
+    <div class="stat-val" id="stat-total">0</div>
+    <div class="stat-lbl" id="stat-total-lbl">Компонентов</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val" id="stat-cats">0</div>
+    <div class="stat-lbl" id="stat-cats-lbl">Категорий</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val" id="stat-ds">0</div>
+    <div class="stat-lbl" id="stat-ds-lbl">Даташитов</div>
+  </div>
+  <div class="stat-cell" style="flex:0 0 auto">
+    <div class="stat-val" id="stat-qty">0</div>
+    <div class="stat-lbl" id="stat-qty-lbl">В наличии</div>
+  </div>
+  <div style="flex:1"></div>
+  <div class="ai-badge" id="ai-badge" style="display:none">
+    <div class="ai-dot"></div>
+    <span id="ai-badge-text">AI поиск…</span>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="side-label" id="lbl-categories">Категории</div>
+    <div id="cat-list"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main">
+    <div class="toolbar">
+      <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="lbl-sort">Сортировка:</span>
+      <button class="sort-btn active" onclick="setSort('name')" id="sort-name">По имени</button>
+      <button class="sort-btn" onclick="setSort('date')" id="sort-date">По дате</button>
+      <button class="sort-btn" onclick="setSort('cat')" id="sort-cat">По категории</button>
+      <div class="result-count" id="result-count"></div>
+    </div>
+    <div class="comp-grid" id="comp-grid"></div>
+    <div id="online-panel" style="display:none" class="online-panel"></div>
+  </main>
+</div>
+
+<!-- DETAIL MODAL -->
+<div id="overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="detail-modal">
+    <div class="modal-head" id="modal-head">
+      <div class="modal-stripe" id="modal-stripe"></div>
+      <div>
+        <div class="modal-title" id="modal-name"></div>
+        <div class="modal-sub" id="modal-sub"></div>
+        <div class="modal-tags" id="modal-tags"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-del" onclick="deleteCurrentComponent()" id="btn-del">Удалить</button>
+        <button class="btn-close" onclick="closeModal()" id="btn-close-modal">Закрыть</button>
+      </div>
+    </div>
+    <div class="tabs" id="modal-tabs"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div id="add-overlay" onclick="handleAddOverlayClick(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:600;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px)">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="add-modal-title">Добавить компонент</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-close" onclick="closeAddModal()">✕</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" id="add-form"></div>
+      <div class="form-actions" style="margin-top:16px">
+        <button class="btn-cancel" onclick="closeAddModal()" id="btn-form-cancel">Отмена</button>
+        <button class="btn-save" onclick="saveNewComponent()" id="btn-form-save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const CATS = {
+  all:         {ru:'Все',       en:'All',         icon:'⬡', color:'#00e5ff'},
+  transistors: {ru:'Транзисторы',en:'Transistors', icon:'⤢', color:'#ff6b35'},
+  capacitors:  {ru:'Конденсаторы',en:'Capacitors', icon:'⊣',  color:'#fbbf24'},
+  resistors:   {ru:'Резисторы', en:'Resistors',   icon:'∿', color:'#60a5fa'},
+  ics:         {ru:'Микросхемы',en:'ICs',          icon:'▦', color:'#a78bfa'},
+  diodes:      {ru:'Диоды',     en:'Diodes',       icon:'▷', color:'#34d399'},
+  inductors:   {ru:'Катушки',   en:'Inductors',    icon:'⌇', color:'#fb923c'},
+  connectors:  {ru:'Разъёмы',   en:'Connectors',   icon:'⏚', color:'#38bdf8'},
+  sensors:     {ru:'Датчики',   en:'Sensors',      icon:'◎', color:'#f472b6'},
+};
+
+const T = {
+  ru:{
+    title:'РадиоБаза',sub:'База данных электронных компонентов',
+    search:'Поиск компонентов...',searchBtn:'Найти в сети',lang:'English',
+    add:'Добавить',categories:'Категории',
+    sortLbl:'Сортировка:',sortName:'По имени',sortDate:'По дате',sortCat:'По категории',
+    statTotal:'Компонентов',statCats:'Категорий',statDs:'Даташитов',statQty:'В наличии',
+    aiText:'AI поиск…',
+    specs:'Характеристики',docs:'Документы',pinout:'Цоколёвка',inventory:'Склад',
+    del:'Удалить',close:'Закрыть',
+    addTitle:'Добавить компонент',cancel:'Отмена',save:'Сохранить',
+    name:'Название',mfr:'Производитель',pkg:'Корпус',cat:'Категория',
+    descRu:'Описание (RU)',descEn:'Описание (EN)',
+    qty:'Количество',loc:'Место хранения',price:'Цена ($)',notes:'Заметки',
+    dsUrl:'Ссылка на даташит',pinoutFld:'Цоколёвка',tags:'Теги (через запятую)',
+    specs_fld:'Параметры (key:val, через ;)',
+    onlineTitle:'Результаты поиска из сети',addToDb:'В базу',added:'Добавлено ✓',
+    openDs:'Открыть даташит',noDs:'Даташит не указан',noPinout:'Нет данных о цоколёвке',
+    noComp:'Нет компонентов',noCompHint:'Добавьте или найдите в сети',
+    result:'из',
+  },
+  en:{
+    title:'RadioBase',sub:'Electronic Components Database',
+    search:'Search components...',searchBtn:'Search Online',lang:'Русский',
+    add:'Add',categories:'Categories',
+    sortLbl:'Sort:',sortName:'By name',sortDate:'By date',sortCat:'By category',
+    statTotal:'Components',statCats:'Categories',statDs:'Datasheets',statQty:'In stock',
+    aiText:'AI searching…',
+    specs:'Specs',docs:'Documents',pinout:'Pinout',inventory:'Inventory',
+    del:'Delete',close:'Close',
+    addTitle:'Add Component',cancel:'Cancel',save:'Save',
+    name:'Name',mfr:'Manufacturer',pkg:'Package',cat:'Category',
+    descRu:'Description (RU)',descEn:'Description (EN)',
+    qty:'Quantity',loc:'Storage Location',price:'Price ($)',notes:'Notes',
+    dsUrl:'Datasheet URL',pinoutFld:'Pinout',tags:'Tags (comma-separated)',
+    specs_fld:'Specs (key:val, semicolon-separated)',
+    onlineTitle:'Online Search Results',addToDb:'Add to DB',added:'Added ✓',
+    openDs:'Open Datasheet',noDs:'No datasheet provided',noPinout:'No pinout data',
+    noComp:'No Components',noCompHint:'Add one or search online',
+    result:'of',
+  }
+};
+
+let lang = 'ru';
+let activeCategory = 'all';
+let sortBy = 'name';
+let currentComponent = null;
+let currentTab = 'specs';
+let onlineResults = [];
+let addedToDb = new Set();
+
+let DB = [
+  {id:1,name:'BC547',category:'transistors',manufacturer:'ON Semiconductor',package:'TO-92',
+   description_ru:'NPN кремниевый транзистор общего назначения для усиления и коммутации',
+   description_en:'NPN Silicon Epitaxial Transistor for general purpose switching and amplification',
+   specs:{Vce:'45V',Ic:'100mA',hFE:'110–800',fT:'300MHz',Ptot:'500mW'},
+   datasheetUrl:'https://www.onsemi.com/pdf/datasheet/bc547-d.pdf',
+   quantity:47,location:'Ящик A-1',price:0.05,notes:'',
+   addedDate:'2024-01-15',
+   pinout:'TO-92: (плоская сторона к себе, снизу)\n1 — Коллектор\n2 — База\n3 — Эмиттер',
+   tags:['npn','amplifier','switch','general purpose']},
+
+  {id:2,name:'NE555',category:'ics',manufacturer:'Texas Instruments',package:'DIP-8',
+   description_ru:'Прецизионный таймер-мультивибратор, один из самых популярных ИС в мире',
+   description_en:'Precision timing circuit, one of the most popular ICs ever made',
+   specs:{Vcc:'4.5–16V',Iout:'200mA',fmax:'500kHz',Ptot:'600mW'},
+   datasheetUrl:'https://www.ti.com/lit/ds/symlink/ne555.pdf',
+   quantity:12,location:'Ящик B-3',price:0.35,notes:'Универсальный таймер',
+   addedDate:'2024-01-20',
+   pinout:'Pin 1 — GND\nPin 2 — TRIG\nPin 3 — OUTPUT\nPin 4 — RESET\nPin 5 — CTRL\nPin 6 — THR\nPin 7 — DIS\nPin 8 — Vcc',
+   tags:['timer','oscillator','pwm','monostable','astable']},
+
+  {id:3,name:'LM358',category:'ics',manufacturer:'STMicroelectronics',package:'DIP-8',
+   description_ru:'Двойной операционный усилитель низкой мощности, работает от однополярного питания',
+   description_en:'Low-power dual operational amplifier, single-supply operation',
+   specs:{Vcc:'3–32V',GBP:'1MHz',Vos:'2mV (typ)',Ib:'45nA'},
+   datasheetUrl:'https://www.st.com/resource/en/datasheet/lm358.pdf',
+   quantity:8,location:'Ящик B-3',price:0.25,notes:'',
+   addedDate:'2024-02-01',
+   pinout:'Pin 1 — OUT1\nPin 2 — IN1−\nPin 3 — IN1+\nPin 4 — GND\nPin 5 — IN2+\nPin 6 — IN2−\nPin 7 — OUT2\nPin 8 — Vcc',
+   tags:['opamp','amplifier','comparator','single-supply']},
+
+  {id:4,name:'1N4007',category:'diodes',manufacturer:'Vishay',package:'DO-41',
+   description_ru:'Выпрямительный диод 1А / 1000В, общего назначения',
+   description_en:'General purpose rectifier diode, 1A 1000V',
+   specs:{Vrrm:'1000V',If:'1A',Vf:'1.1V',Ifsm:'30A'},
+   datasheetUrl:'https://www.vishay.com/docs/88503/1n4001.pdf',
+   quantity:120,location:'Ящик A-2',price:0.03,notes:'Выпрямление сетевого питания',
+   addedDate:'2024-01-10',
+   pinout:'Полоса на корпусе = КАТОД (−)\nДругой вывод = АНОД (+)',
+   tags:['rectifier','1000v','power','general purpose']},
+
+  {id:5,name:'ATmega328P',category:'ics',manufacturer:'Microchip',package:'DIP-28',
+   description_ru:'8-битный AVR микроконтроллер — сердце Arduino Uno. Flash 32KB, SRAM 2KB',
+   description_en:'8-bit AVR microcontroller — the heart of Arduino Uno. Flash 32KB, SRAM 2KB',
+   specs:{Vcc:'1.8–5.5V',Flash:'32KB',SRAM:'2KB',EEPROM:'1KB',fmax:'20MHz'},
+   datasheetUrl:'https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf',
+   quantity:5,location:'Ящик C-1',price:2.50,notes:'Arduino Uno совместимый',
+   addedDate:'2024-02-15',
+   pinout:'DIP-28 — полная распиновка в даташите (стр. 12)\nPC6/RESET — пин 1\nPD0..PD7 — пины 2–6, 11–13\nPB0..PB7 — пины 14–19\nPC0..PC5 — пины 23–28',
+   tags:['mcu','avr','arduino','microcontroller','8-bit']},
+
+  {id:6,name:'2N2222',category:'transistors',manufacturer:'Fairchild',package:'TO-18',
+   description_ru:'NPN транзистор для высокочастотных переключений и усиления сигналов',
+   description_en:'NPN transistor for high-speed switching and RF amplification',
+   specs:{Vce:'40V',Ic:'600mA',hFE:'35–300',fT:'250MHz',Ptot:'625mW'},
+   datasheetUrl:'https://www.onsemi.com/pdf/datasheet/p2n2222a-d.pdf',
+   quantity:33,location:'Ящик A-1',price:0.08,notes:'',
+   addedDate:'2024-01-18',
+   pinout:'TO-18 (металл, вид снизу):\n  E — Эмиттер\n  B — База\n  C — Коллектор\n(по часовой стрелке от метки)',
+   tags:['npn','switching','rf','amplifier']},
+
+  {id:7,name:'IRF540N',category:'transistors',manufacturer:'Vishay',package:'TO-220',
+   description_ru:'N-канальный силовой МОП-транзистор 100В 33А — для управления моторами и нагрузками',
+   description_en:'N-channel power MOSFET 100V 33A — motor and load control',
+   specs:{Vds:'100V',Id:'33A',Rds:'44mΩ',Vgs:'20V',Pd:'150W'},
+   datasheetUrl:'https://www.vishay.com/docs/91021/91021.pdf',
+   quantity:10,location:'Ящик D-2',price:0.90,notes:'',
+   addedDate:'2024-03-01',
+   pinout:'TO-220 (слева направо, стоя лицом к надписи):\n1 — Затвор (Gate)\n2 — Исток (Drain)\n3 — Сток (Source)\nТаблица на металлическом фланце — Drain',
+   tags:['mosfet','nmos','power','motor driver']},
+];
+
+// ─── Language ────────────────────────────────────────────────────────────────
+function t(k){return T[lang][k]||k}
+function toggleLang(){
+  lang = lang==='ru'?'en':'ru';
+  applyLang();
+  renderSidebar();
+  renderGrid();
+}
+function applyLang(){
+  const L = T[lang];
+  document.getElementById('lbl-title').textContent = L.title;
+  document.getElementById('lbl-sub').textContent   = L.sub;
+  document.getElementById('search-input').placeholder = L.search;
+  document.getElementById('btn-online').textContent = L.searchBtn;
+  document.getElementById('btn-lang').textContent   = L.lang;
+  document.getElementById('lbl-add').textContent    = L.add;
+  document.getElementById('lbl-categories').textContent = L.categories;
+  document.getElementById('lbl-sort').textContent   = L.sortLbl;
+  document.getElementById('sort-name').textContent  = L.sortName;
+  document.getElementById('sort-date').textContent  = L.sortDate;
+  document.getElementById('sort-cat').textContent   = L.sortCat;
+  document.getElementById('stat-total-lbl').textContent = L.statTotal;
+  document.getElementById('stat-cats-lbl').textContent  = L.statCats;
+  document.getElementById('stat-ds-lbl').textContent    = L.statDs;
+  document.getElementById('stat-qty-lbl').textContent   = L.statQty;
+  document.getElementById('ai-badge-text').textContent  = L.aiText;
+  updateStats();
+}
+
+// ─── Stats ───────────────────────────────────────────────────────────────────
+function updateStats(){
+  document.getElementById('stat-total').textContent = DB.length;
+  document.getElementById('stat-cats').textContent  = new Set(DB.map(c=>c.category)).size;
+  document.getElementById('stat-ds').textContent    = DB.filter(c=>c.datasheetUrl).length;
+  document.getElementById('stat-qty').textContent   = DB.reduce((s,c)=>s+(c.quantity||0),0);
+}
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+function renderSidebar(){
+  const list = document.getElementById('cat-list');
+  list.innerHTML = Object.entries(CATS).map(([key,meta])=>{
+    const cnt = key==='all'?DB.length:DB.filter(c=>c.category===key).length;
+    const active = activeCategory===key;
+    return `<div class="cat-item${active?' active':''}"
+      style="${active?`border-left-color:${meta.color};background:${meta.color}11`:''}"
+      onclick="setCategory('${key}')">
+      <span class="cat-icon" style="color:${meta.color}">${meta.icon}</span>
+      <span>${meta[lang]}</span>
+      <span class="cat-count">${cnt}</span>
+    </div>`;
+  }).join('');
+}
+function setCategory(cat){
+  activeCategory=cat;
+  renderSidebar();
+  renderGrid();
+}
+
+// ─── Sort ────────────────────────────────────────────────────────────────────
+function setSort(s){
+  sortBy=s;
+  ['name','date','cat'].forEach(k=>{
+    document.getElementById('sort-'+k).classList.toggle('active',s===k);
+  });
+  renderGrid();
+}
+
+// ─── Filter & sort ───────────────────────────────────────────────────────────
+function getFiltered(){
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  return DB
+    .filter(c=>activeCategory==='all'||c.category===activeCategory)
+    .filter(c=>{
+      if(!q)return true;
+      return c.name.toLowerCase().includes(q)||
+        (c.manufacturer||'').toLowerCase().includes(q)||
+        (c['description_'+lang]||'').toLowerCase().includes(q)||
+        (c.tags||[]).some(t=>t.includes(q));
+    })
+    .sort((a,b)=>{
+      if(sortBy==='name') return a.name.localeCompare(b.name);
+      if(sortBy==='date') return new Date(b.addedDate)-new Date(a.addedDate);
+      if(sortBy==='cat')  return a.category.localeCompare(b.category);
+      return 0;
+    });
+}
+
+// ─── Grid ────────────────────────────────────────────────────────────────────
+function renderGrid(){
+  const filtered = getFiltered();
+  const grid = document.getElementById('comp-grid');
+  document.getElementById('result-count').textContent = `${filtered.length} ${t('result')} ${DB.length}`;
+
+  if(!filtered.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1">
+      <div class="empty-icon">📦</div>
+      <div class="empty-title">${t('noComp')}</div>
+      <div class="empty-hint">${t('noCompHint')}</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(c=>{
+    const meta = CATS[c.category]||{color:'#64748b'};
+    const qtyClass = (c.quantity||0)>0?'qty-ok':'qty-zero';
+    return `<div class="comp-card" onclick="openDetail(${c.id})"
+      onmouseenter="this.style.borderColor='${meta.color}88'"
+      onmouseleave="this.style.borderColor=''">
+      <div class="card-stripe" style="background:linear-gradient(90deg,${meta.color},transparent)"></div>
+      <div class="card-name">${c.name}</div>
+      <div class="card-mfr">${c.manufacturer||'—'} · ${c.package||'—'}</div>
+      <div class="card-desc">${c['description_'+lang]||''}</div>
+      <div class="card-foot">
+        <span class="badge" style="background:${meta.color}22;color:${meta.color};border:1px solid ${meta.color}44">
+          ${meta[lang]}
+        </span>
+        <span class="${qtyClass}">${c.quantity||0} шт</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Detail modal ────────────────────────────────────────────────────────────
+function openDetail(id){
+  currentComponent = DB.find(c=>c.id===id);
+  if(!currentComponent)return;
+  currentTab='specs';
+  renderModal();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  currentComponent=null;
+}
+function handleOverlayClick(e){if(e.target===document.getElementById('overlay'))closeModal()}
+
+function renderModal(){
+  const c = currentComponent;
+  const meta = CATS[c.category]||{color:'#00e5ff'};
+  document.getElementById('modal-stripe').style.background=`linear-gradient(90deg,${meta.color},transparent)`;
+  document.getElementById('modal-name').textContent=c.name;
+  document.getElementById('modal-sub').textContent=`${c.manufacturer||'?'} · ${c.package||'?'}`;
+  document.getElementById('btn-del').textContent=t('del');
+  document.getElementById('btn-close-modal').textContent=t('close');
+  document.getElementById('modal-tags').innerHTML=(c.tags||[]).map(tag=>
+    `<span class="badge" style="background:${meta.color}22;color:${meta.color};border:1px solid ${meta.color}44">${tag}</span>`
+  ).join('');
+
+  const tabs = [['specs',t('specs')],['docs',t('docs')],['pinout',t('pinout')],['inventory',t('inventory')]];
+  document.getElementById('modal-tabs').innerHTML=tabs.map(([k,label])=>
+    `<button class="tab-btn${currentTab===k?' active':''}" onclick="switchTab('${k}')">${label}</button>`
+  ).join('');
+
+  renderTabContent(meta);
+}
+
+function switchTab(tab){currentTab=tab;renderModal()}
+
+function renderTabContent(meta){
+  const c = currentComponent;
+  const desc = `<div class="desc-box" style="border-left-color:${meta.color}">${c['description_'+lang]||''}</div>`;
+
+  let body='';
+  if(currentTab==='specs'){
+    const specs = Object.entries(c.specs||{}).map(([k,v])=>
+      `<div class="spec-item"><div class="spec-key">${k}</div><div class="spec-val">${v}</div></div>`
+    ).join('');
+    body=`${desc}<div class="spec-grid">${specs||'—'}</div>`;
+  } else if(currentTab==='docs'){
+    if(c.datasheetUrl){
+      body=`${desc}<a class="doc-link" href="${c.datasheetUrl}" target="_blank" rel="noopener"
+        style="border-color:${meta.color}44">
+        <span class="doc-link-icon">📄</span>
+        <div>
+          <div class="doc-link-title">${t('openDs')}</div>
+          <div class="doc-link-url">${c.datasheetUrl}</div>
+        </div>
+      </a>`;
+    } else {
+      body=`${desc}<div style="color:var(--muted);font-size:13px;padding:10px 0">${t('noDs')}</div>`;
+    }
+  } else if(currentTab==='pinout'){
+    body=`${desc}<div class="pinout-box">${(c.pinout||t('noPinout')).replace(/\n/g,'<br>')}</div>`;
+  } else if(currentTab==='inventory'){
+    const rows = [
+      [t('qty'), `${c.quantity||0} шт`, (c.quantity||0)>0?'var(--accent3)':'var(--danger)'],
+      [t('loc'), c.location||'—', 'var(--text)'],
+      [t('price'), c.price?`$${c.price}`:'—', 'var(--warn)'],
+      ['Added', c.addedDate||'—', 'var(--muted2)'],
+    ];
+    const rowsHtml = rows.map(([k,v,col])=>
+      `<div class="inv-row"><span class="inv-label">${k}</span><span class="inv-val" style="color:${col}">${v}</span></div>`
+    ).join('');
+    const notesHtml = c.notes?`<div class="pinout-box" style="margin-top:12px">${c.notes}</div>`:'';
+    body=`${desc}${rowsHtml}${notesHtml}`;
+  }
+  document.getElementById('modal-body').innerHTML=body;
+}
+
+function deleteCurrentComponent(){
+  if(!currentComponent)return;
+  DB=DB.filter(c=>c.id!==currentComponent.id);
+  closeModal();
+  renderSidebar();
+  renderGrid();
+  updateStats();
+}
+
+// ─── Online search ───────────────────────────────────────────────────────────
+async function onlineSearch(){
+  const q = document.getElementById('search-input').value.trim();
+  if(!q)return;
+
+  document.getElementById('ai-badge').style.display='flex';
+  document.getElementById('btn-online').disabled=true;
+  document.getElementById('btn-online').textContent='…';
+
+  const panel = document.getElementById('online-panel');
+  panel.style.display='none';
+  panel.innerHTML='';
+
+  const prompt = lang==='ru'
+    ? `Ты эксперт по электронным компонентам. Найди информацию о "${q}". Верни ТОЛЬКО JSON массив без markdown, 3-5 объектов:
+[{"name":"","category":"transistors|capacitors|resistors|ics|diodes|inductors|connectors|sensors","manufacturer":"","package":"","description_ru":"","description_en":"","specs":{"ключ":"значение"},"datasheetUrl":"","tags":[]}]`
+    : `You are an electronics expert. Find info about "${q}". Return ONLY a JSON array, no markdown, 3-5 objects:
+[{"name":"","category":"transistors|capacitors|resistors|ics|diodes|inductors|connectors|sensors","manufacturer":"","package":"","description_ru":"","description_en":"","specs":{"key":"value"},"datasheetUrl":"","tags":[]}]`;
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const raw = (data.content||[]).map(b=>b.text||'').join('');
+    const clean = raw.replace(/```json|```/g,'').trim();
+    onlineResults = JSON.parse(clean);
+  } catch(e){
+    onlineResults=[];
+  }
+
+  document.getElementById('ai-badge').style.display='none';
+  document.getElementById('btn-online').disabled=false;
+  document.getElementById('btn-online').textContent=t('searchBtn');
+
+  renderOnlinePanel(q);
+}
+
+function renderOnlinePanel(q){
+  const panel = document.getElementById('online-panel');
+  if(!onlineResults.length){panel.style.display='none';return;}
+  panel.style.display='block';
+
+  const cards = onlineResults.map((c,i)=>{
+    const meta = CATS[c.category]||{color:'#64748b',ru:c.category,en:c.category};
+    const isDone = addedToDb.has(c.name);
+    const specs = Object.entries(c.specs||{}).map(([k,v])=>
+      `<span class="spec-chip">${k}: ${v}</span>`).join('');
+    return `<div class="online-card">
+      <div style="flex:1">
+        <div class="online-name">${c.name}</div>
+        <div class="online-meta">
+          ${c.manufacturer||'?'} · ${c.package||'?'} ·
+          <span style="color:${meta.color}">${meta[lang]}</span>
+        </div>
+        <div class="online-desc">${c['description_'+lang]||''}</div>
+        ${specs?`<div class="spec-chips">${specs}</div>`:''}
+      </div>
+      <button class="btn-online-add${isDone?' done':''}"
+        onclick="addOnlineComp(${i})" ${isDone?'disabled':''}>
+        ${isDone?t('added'):`+ ${t('addToDb')}`}
+      </button>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML=`
+    <div class="online-title">
+      <span>🌐</span>
+      <span>${t('onlineTitle')}: «${q}»</span>
+    </div>
+    ${cards}`;
+}
+
+function addOnlineComp(i){
+  const c = onlineResults[i];
+  const newComp = {
+    ...c,
+    id: Date.now()+i,
+    quantity:0,location:'',price:0,notes:'',
+    addedDate:new Date().toISOString().split('T')[0],
+    pinout:'',
+  };
+  DB.push(newComp);
+  addedToDb.add(c.name);
+  renderOnlinePanel(document.getElementById('search-input').value.trim());
+  renderSidebar();
+  renderGrid();
+  updateStats();
+}
+
+// ─── Add form ─────────────────────────────────────────────────────────────────
+function openAddModal(){
+  document.getElementById('add-modal-title').textContent = t('addTitle');
+  document.getElementById('btn-form-cancel').textContent = t('cancel');
+  document.getElementById('btn-form-save').textContent   = t('save');
+  const catOptions = Object.entries(CATS).filter(([k])=>k!=='all').map(([k,meta])=>
+    `<option value="${k}">${meta[lang]}</option>`).join('');
+  document.getElementById('add-form').innerHTML=`
+    <div class="form-group"><label class="form-label">${t('name')}</label><input class="form-input" id="f-name" required/></div>
+    <div class="form-group"><label class="form-label">${t('mfr')}</label><input class="form-input" id="f-mfr"/></div>
+    <div class="form-group"><label class="form-label">${t('pkg')}</label><input class="form-input" id="f-pkg"/></div>
+    <div class="form-group"><label class="form-label">${t('cat')}</label>
+      <select class="form-select" id="f-cat">${catOptions}</select></div>
+    <div class="form-group full"><label class="form-label">${t('descRu')}</label><textarea class="form-textarea" id="f-dru"></textarea></div>
+    <div class="form-group full"><label class="form-label">${t('descEn')}</label><textarea class="form-textarea" id="f-den"></textarea></div>
+    <div class="form-group full"><label class="form-label">${t('specs_fld')} (напр: Vce:45V;Ic:100mA)</label><input class="form-input" id="f-specs"/></div>
+    <div class="form-group full"><label class="form-label">${t('dsUrl')}</label><input class="form-input" id="f-ds" type="url"/></div>
+    <div class="form-group full"><label class="form-label">${t('pinoutFld')}</label><textarea class="form-textarea" id="f-pinout"></textarea></div>
+    <div class="form-group"><label class="form-label">${t('qty')}</label><input class="form-input" id="f-qty" type="number" value="0" min="0"/></div>
+    <div class="form-group"><label class="form-label">${t('price')}</label><input class="form-input" id="f-price" type="number" step="0.01" value="0" min="0"/></div>
+    <div class="form-group"><label class="form-label">${t('loc')}</label><input class="form-input" id="f-loc"/></div>
+    <div class="form-group"><label class="form-label">${t('tags')}</label><input class="form-input" id="f-tags"/></div>
+    <div class="form-group full"><label class="form-label">${t('notes')}</label><textarea class="form-textarea" id="f-notes"></textarea></div>
+  `;
+  const ov = document.getElementById('add-overlay');
+  ov.style.display='flex';
+}
+function closeAddModal(){document.getElementById('add-overlay').style.display='none'}
+function handleAddOverlayClick(e){if(e.target===document.getElementById('add-overlay'))closeAddModal()}
+
+function saveNewComponent(){
+  const name = document.getElementById('f-name').value.trim();
+  if(!name)return;
+  const specsRaw = document.getElementById('f-specs').value.trim();
+  const specs={};
+  if(specsRaw) specsRaw.split(';').forEach(pair=>{
+    const [k,v]=pair.split(':');
+    if(k&&v) specs[k.trim()]=v.trim();
+  });
+  const comp = {
+    id:Date.now(),
+    name,
+    manufacturer:document.getElementById('f-mfr').value.trim(),
+    package:document.getElementById('f-pkg').value.trim(),
+    category:document.getElementById('f-cat').value,
+    description_ru:document.getElementById('f-dru').value.trim(),
+    description_en:document.getElementById('f-den').value.trim(),
+    specs,
+    datasheetUrl:document.getElementById('f-ds').value.trim(),
+    pinout:document.getElementById('f-pinout').value.trim(),
+    quantity:parseInt(document.getElementById('f-qty').value)||0,
+    price:parseFloat(document.getElementById('f-price').value)||0,
+    location:document.getElementById('f-loc').value.trim(),
+    tags:document.getElementById('f-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    notes:document.getElementById('f-notes').value.trim(),
+    addedDate:new Date().toISOString().split('T')[0],
+  };
+  DB.push(comp);
+  closeAddModal();
+  renderSidebar();
+  renderGrid();
+  updateStats();
+}
+
+// ─── Search input live filter ─────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input',()=>renderGrid());
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+applyLang();
+renderSidebar();
+renderGrid();
+</script>
+</body>
+</html>
